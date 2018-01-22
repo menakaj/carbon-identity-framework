@@ -1,0 +1,3 @@
+instructions.configure = \
+org.eclipse.equinox.p2.touchpoint.natives.copy(source:${installFolder}/../features/org.wso2.carbon.identity.retryable
+.provisioning..server_${feature.version}/api#identity#retryable#provisioning#v1.0.war,target:${installFolder}/../../deployment/server/webapps/api#identity#retryable#provisioning#v1.0.war,overwrite:true);\

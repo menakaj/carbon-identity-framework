@@ -57,6 +57,7 @@
         <module>components/workflow-mgt</module>
         <module>components/policy-editor</module>
         <module>components/carbon-authenticators</module>
+        <module>components/retryable-provisioning</module>
         <module>features/security-mgt</module>
         <module>features/claim-mgt</module>
         <module>features/identity-core</module>
@@ -66,6 +67,7 @@
         <module>features/authentication-framework</module>
         <module>features/application-mgt</module>
         <module>features/provisioning</module>
+        <module>features/retryable-provisioning</module>
         <module>features/notification-mgt</module>
         <module>features/idp-mgt</module>
         <module>features/directory-server-manager</module>
