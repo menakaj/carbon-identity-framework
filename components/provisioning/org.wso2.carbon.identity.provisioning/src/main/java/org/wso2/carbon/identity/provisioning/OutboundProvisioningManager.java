@@ -366,6 +366,39 @@ public class OutboundProvisioningManager {
     }
 
     /**
+     * The method to perform provisioning for the given identity provider.
+     *
+     * In this method, the default connector for the given idp is retrieved and perform the provisioning.
+     * @param provisioningEntity : The provisioning entity object.
+     * @param idpName : The name of the idp which the provisioning should be performed.
+     */
+    public void provisionToIDP(ProvisioningEntity provisioningEntity, String idpName) {
+
+        String tenantDomain = MultitenantConstants.SUPER_TENANT_DOMAIN_NAME;
+
+        try {
+            IdentityProvider identityProvider = IdentityProviderManager.getInstance().getEnabledIdPByName(idpName,
+                    tenantDomain);
+            Map<String, AbstractProvisioningConnectorFactory> registeredConnectorFactories =
+                    IdentityProvisionServiceComponent.getConnectorFactories();
+            AbstractOutboundProvisioningConnector connector = getOutboundProvisioningConnector(identityProvider,
+                    registeredConnectorFactories, tenantDomain, false);
+
+            String connectorType = identityProvider.getDefaultProvisioningConnectorConfig().getName();
+
+            ExecutorService executorService = Executors.newFixedThreadPool(1);
+            Callable<Boolean> proThread = new ProvisioningThread(provisioningEntity, tenantDomain, connector,
+                    connectorType, idpName, dao);
+            executeOutboundProvisioning(provisioningEntity, executorService, connectorType, idpName, proThread, false);
+
+        } catch (IdentityProviderManagementException e) {
+            log.error("Error while retrieving the Identity Provider. ", e);
+        } catch (IdentityProvisioningException e) {
+            log.error("Error while provisioning. ", e);
+        }
+    }
+
+    /**
      * @param provisioningEntity
      * @param serviceProviderIdentifier
      * @param inboundClaimDialect

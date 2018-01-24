@@ -21,11 +21,15 @@ package org.wso2.carbon.identity.provisioning;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.context.CarbonContext;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.application.common.IdentityApplicationManagementException;
 import org.wso2.carbon.identity.provisioning.dao.CacheBackedProvisioningMgtDAO;
 import org.wso2.carbon.idp.mgt.util.IdPManagementUtil;
 import org.wso2.carbon.user.api.UserStoreException;
+import org.wso2.carbon.utils.CarbonUtils;
+import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
+
 import java.util.UUID;
 import java.util.concurrent.Callable;
 
@@ -67,9 +71,21 @@ public class ProvisioningThread implements Callable<Boolean> {
             // real provisioning happens now.
             provisionedIdentifier = connector.provision(provisioningEntity);
 
+            int tenantId = IdPManagementUtil.getTenantIdOfDomain(tenantDomainName);
+
             if (provisioningEntity.getOperation() == ProvisioningOperation.DELETE) {
-                deleteProvisionedEntityIdentifier(idPName, connectorType, provisioningEntity,
-                        tenantDomainName);
+
+                //Check whether the entry exists before delete.
+                // This check is required when retrying the provisioning. At the first attempt of deleting an entity,
+                // the cached entry will be removed. Then, when re-trying, it will again try to remove the same
+                // record and throw an error. To avoid this we check whether the provisioning identifier exists
+                // before deleting.
+                if (dao.getProvisionedIdentifier(idPName, connectorType, provisioningEntity, tenantId,
+                        tenantDomainName) != null) {
+                    deleteProvisionedEntityIdentifier(idPName, connectorType, provisioningEntity,
+                            tenantDomainName);
+                }
+
             } else if (provisioningEntity.getOperation() == ProvisioningOperation.POST) {
 
                 if (provisionedIdentifier == null || provisionedIdentifier.getIdentifier() == null) {
@@ -79,9 +95,16 @@ public class ProvisioningThread implements Callable<Boolean> {
 
                 provisioningEntity.setIdentifier(provisionedIdentifier);
 
-                // store provisioned identifier for future reference.
-                storeProvisionedEntityIdentifier(idPName, connectorType, provisioningEntity,
-                        tenantDomainName);
+                // Check for the existing provisioning identifier.
+                // The identifier will be persisted in the time of provisioning. So, when re-attempting it will try
+                // to persist the same payload which will throw an Unique indexing or Primary key violation exception.
+                if (dao.getProvisionedIdentifier(idPName, connectorType, provisioningEntity, tenantId,
+                        tenantDomainName) == null) {
+                    // store provisioned identifier for future reference.
+                    storeProvisionedEntityIdentifier(idPName, connectorType, provisioningEntity,
+                            tenantDomainName);
+                }
+
             } else if (provisioningEntity.getEntityType() == ProvisioningEntityType.GROUP &&
                        provisioningEntity.getOperation() == ProvisioningOperation.PUT) {
 
