@@ -25,10 +25,7 @@ public class RetryableProvisioningConstants {
     public static final String CONFIGS = "config";
     public static final String CREATE = "Create";
     public static final String DELETE = "Delete";
-    public static final String METHOD = "method";
-    public static final String PROVISIONING_RESPONSE = "provisioning_response";
     public static final String PROV_ENTITY = "payload";
-    public static final String STATUS_LINE = "status_line";
     public static final String UPDATE = "Update";
     public static final String IDP_NAME = "identityProviderName";
     public static final String STATUS_CODE = "status_code";
@@ -42,15 +39,15 @@ public class RetryableProvisioningConstants {
         public static final String ADD_PROVISIONING_STATUS = "INSERT INTO IDN_PROVISIONING_STATUS (TENANT_ID, " +
                 "IDP_NAME, STATUS, ENTITY, OPERATION, CAUSE) VALUES (?, ?, ?, ?, ?, ?)";
         public static final String DELETE_PROVISIONING_STATUS = "DELETE FROM IDN_PROVISIONING_STATUS WHERE STATUS_ID " +
-                "IN (?)";
+                "IN ";
 
         //Provisioning metadata queries.
         public static final String ADD_PROVISIONING_METADATA = "INSERT INTO IDN_PROVISIONING_METADATA (STATUS_ID, " +
                 "TENANT_ID, PROVISIONING_ENTITY, CONNECTOR_CONFIG) VALUES (?, ?, ?, ?)";
-        public static final String GET_PROVISIONING_METADATA = "SELECT FROM IDN_PROVISIONING_METADATA WHERE STATUS_ID" +
-                " IN (?)";
+        public static final String GET_PROVISIONING_METADATA = "SELECT * FROM IDN_PROVISIONING_METADATA WHERE " +
+                "STATUS_ID IN ";
         public static final String DELETE_PROVISIONING_METADATA = "DELETE FROM IDN_PROVISIONING_METADATA WHERE " +
-                "STATUS_ID IN (?)";
+                "STATUS_ID IN ";
 
     }
 }

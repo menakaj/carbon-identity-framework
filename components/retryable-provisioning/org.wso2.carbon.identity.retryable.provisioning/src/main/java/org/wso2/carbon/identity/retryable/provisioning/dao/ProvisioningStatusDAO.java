@@ -58,8 +58,8 @@ public interface ProvisioningStatusDAO {
     /**
      * Deleted the given provisioning status entries.
      *
-     * @param provisioningIDs : The list of provisioning ids to be deleted.
+     * @param provisioningIds : The list of provisioning ids to be deleted.
      */
-    boolean deleteProvisioningStatus(List<Integer> provisioningIDs) throws RetryableProvisioningException;
+    boolean deleteProvisioningStatus(List<Integer> provisioningIds) throws RetryableProvisioningException;
 
 }

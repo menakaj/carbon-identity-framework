@@ -22,6 +22,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpStatus;
 import org.wso2.carbon.context.CarbonContext;
+import org.wso2.carbon.identity.provisioning.OutboundProvisioningManager;
 import org.wso2.carbon.identity.provisioning.ProvisioningEntity;
 import org.wso2.carbon.identity.retryable.provisioning.beans.FilterConfig;
 import org.wso2.carbon.identity.retryable.provisioning.beans.ProvisioningMetadata;
@@ -74,9 +75,6 @@ public class RetryableProvisioningManagerImpl implements RetryableProvisioningMa
         ProvisioningStatus provisioningStatus = generateProvisioningStatus(provisioningEntity, statusCode, cause,
                 properties);
 
-        provisioningMetadata.setTenantId(tenantId);
-        provisioningStatus.setTenantId(tenantId);
-
         //Persist the generated provisioning status and metadata objects.
         if (log.isDebugEnabled()) {
             log.debug("Persisting provisioning status and provisioning metadata.");
@@ -90,8 +88,6 @@ public class RetryableProvisioningManagerImpl implements RetryableProvisioningMa
         } catch (RetryableProvisioningException e) {
             log.error("Error while persisting Provisioning information. ", e);
         }
-
-
     }
 
     @Override
@@ -134,13 +130,14 @@ public class RetryableProvisioningManagerImpl implements RetryableProvisioningMa
             for (ProvisioningMetadata provisioningMetadata : metadataList) {
                 ProvisioningEntity provisioningEntity = jsonConverter.convertFromJson(provisioningMetadata
                         .getProvisioningEntity());
-                // TODO : Implement the retry section in a util class.
-
+                String idpName = gson.fromJson(provisioningMetadata.getConnectorConfiguration(), Properties.class)
+                        .getProperty(RetryableProvisioningConstants.IDP_NAME);
+                OutboundProvisioningManager.getInstance().provisionToIDP(provisioningEntity, idpName);
 
                 provisioningIDsToDelete.add(provisioningMetadata.getStatusId());
             }
 
-            //The retry process should be immutable. So we remove the existing provisioning status.
+            //The retry process should be immutable. So we remove the re-attempted provisions.
             provisioningStatusDAO.deleteProvisioningStatus(provisioningIDsToDelete);
         } catch (RetryableProvisioningException e) {
             log.error("Error while reattempting provisioning. ", e);
@@ -159,6 +156,7 @@ public class RetryableProvisioningManagerImpl implements RetryableProvisioningMa
         String provisioningEntityString = jsonConverter.convertToJson(provisioningEntity);
 
         ProvisioningMetadata provisioningMetadata = new ProvisioningMetadata();
+        provisioningMetadata.setTenantId(tenantId);
         provisioningMetadata.setProvisioningEntity(provisioningEntityString);
         provisioningMetadata.setConnectorConfiguration(gson.toJson(config));
         provisioningMetadata.setIdpName(config.getProperty(RetryableProvisioningConstants.IDP_NAME));
@@ -186,6 +184,7 @@ public class RetryableProvisioningManagerImpl implements RetryableProvisioningMa
         } else {
             provisioningStatus.setStatus("SUCCESS");
         }
+        provisioningStatus.setTenantId(tenantId);
         provisioningStatus.setOperation(provisioningEntity.getOperation().name());
         provisioningStatus.setCause(cause);
         provisioningStatus.setName(provisioningEntity.getEntityName());

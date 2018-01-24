@@ -22,10 +22,10 @@ import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.core.util.IdentityDatabaseUtil;
 import org.wso2.carbon.identity.retryable.provisioning.beans.ProvisioningMetadata;
 import org.wso2.carbon.identity.retryable.provisioning.constants.RetryableProvisioningConstants;
+import org.wso2.carbon.identity.retryable.provisioning.dao.DAOUtils;
 import org.wso2.carbon.identity.retryable.provisioning.dao.ProvisioningMetadataDAO;
 import org.wso2.carbon.identity.retryable.provisioning.exception.RetryableProvisioningException;
 
-import java.sql.Array;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -76,13 +76,15 @@ public class ProvisioningMetadataDAOImpl implements ProvisioningMetadataDAO {
             log.debug("Retrieving Provisioning metadata.");
         }
 
+        String query = DAOUtils.buildDynamicQuery(RetryableProvisioningConstants.DAOConstants
+                .GET_PROVISIONING_METADATA, provisioningIds.size());
+
         try (Connection connection = IdentityDatabaseUtil.getDBConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(RetryableProvisioningConstants
-                     .DAOConstants.GET_PROVISIONING_METADATA)) {
+             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
 
-            Array ids = connection.createArrayOf("INTEGER", provisioningIds.toArray());
-
-            preparedStatement.setArray(1, ids);
+            for (int i = 1; i <= provisioningIds.size(); i++) {
+                preparedStatement.setInt(i, provisioningIds.get(i-1));
+            }
 
             resultSet = preparedStatement.executeQuery();
 
@@ -110,17 +112,19 @@ public class ProvisioningMetadataDAOImpl implements ProvisioningMetadataDAO {
             log.debug("Deleting provisioning metadata.");
         }
 
+        String query = DAOUtils.buildDynamicQuery(RetryableProvisioningConstants.DAOConstants
+                .DELETE_PROVISIONING_METADATA, provisioningIds.size());
+
         try (Connection connection = IdentityDatabaseUtil.getDBConnection();
-             PreparedStatement preparedStatement =
-                     connection.prepareStatement(
-                             RetryableProvisioningConstants.DAOConstants.DELETE_PROVISIONING_METADATA)) {
+             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
 
             boolean isAutoCommit = connection.getAutoCommit();
             connection.setAutoCommit(false);
 
-            Array ids = connection.createArrayOf("INTEGER", provisioningIds.toArray());
+            for (int i = 1; i <= provisioningIds.size(); i++) {
+                preparedStatement.setInt(i, provisioningIds.get(i - 1));
+            }
 
-            preparedStatement.setArray(1, ids);
             preparedStatement.executeUpdate();
             connection.commit();
 

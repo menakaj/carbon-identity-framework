@@ -23,10 +23,10 @@ import org.wso2.carbon.identity.core.util.IdentityDatabaseUtil;
 import org.wso2.carbon.identity.retryable.provisioning.beans.FilterConfig;
 import org.wso2.carbon.identity.retryable.provisioning.beans.ProvisioningStatus;
 import org.wso2.carbon.identity.retryable.provisioning.constants.RetryableProvisioningConstants;
+import org.wso2.carbon.identity.retryable.provisioning.dao.DAOUtils;
 import org.wso2.carbon.identity.retryable.provisioning.dao.ProvisioningStatusDAO;
 import org.wso2.carbon.identity.retryable.provisioning.exception.RetryableProvisioningException;
 
-import java.sql.Array;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -69,14 +69,14 @@ public class ProvisioningStatusDAOImpl implements ProvisioningStatusDAO {
 
             preparedStatement.executeUpdate();
 
+            // Retrieve the auto generated key.
             rs = preparedStatement.getGeneratedKeys();
 
-            //Get the auto generated status id.
             while (rs.next()) {
                 if (log.isDebugEnabled()) {
                     log.debug("Provisioning Status persisted successfully.");
                 }
-                statusId = rs.getInt(1);
+                statusId = rs.getInt(1); // 1 is the index of the column.
             }
 
             connection.commit();
@@ -144,26 +144,28 @@ public class ProvisioningStatusDAOImpl implements ProvisioningStatusDAO {
     }
 
     @Override
-    public boolean deleteProvisioningStatus(List<Integer> provisioningIDs) throws RetryableProvisioningException {
+    public boolean deleteProvisioningStatus(List<Integer> provisioningIds) throws RetryableProvisioningException {
         if (log.isDebugEnabled()) {
             log.debug("Deleting provisioning status.");
         }
 
+        String query = DAOUtils.buildDynamicQuery(RetryableProvisioningConstants.DAOConstants
+                .DELETE_PROVISIONING_STATUS, provisioningIds.size());
+
         try (Connection connection = IdentityDatabaseUtil.getDBConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(RetryableProvisioningConstants
-                     .DAOConstants.DELETE_PROVISIONING_STATUS)) {
+             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
             boolean isAutoCommit = connection.getAutoCommit();
 
-            Array ids = connection.createArrayOf("INTEGER", provisioningIDs.toArray());
+            for (int i = 1; i <= provisioningIds.size(); i++) {
+                preparedStatement.setInt(i, provisioningIds.get(i - 1));
+            }
 
-            preparedStatement.setArray(1, ids);
             preparedStatement.executeUpdate();
 
             if (log.isDebugEnabled()) {
                 log.debug("Provisioning status deleted successfully.");
             }
             connection.commit();
-
             connection.setAutoCommit(isAutoCommit);
         } catch (SQLException e) {
             throw new RetryableProvisioningException("Error while deleting Provisioning Status", e);
