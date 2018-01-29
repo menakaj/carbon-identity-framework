@@ -52,7 +52,6 @@ public class RetryableProvisioningManagerImpl implements RetryableProvisioningMa
     private ProvisioningMetadataDAO provisioningMetadataDAO = new ProvisioningMetadataDAOImpl();
     private ProvisioningEntityToJsonConverter jsonConverter = new ProvisioningEntityToJsonConverter();
     private Gson gson = new Gson();
-    private int tenantId = CarbonContext.getThreadLocalCarbonContext().getTenantId();
 
     @Override
     public void processEvent(Map<String, Object> eventProperties) {
@@ -91,9 +90,8 @@ public class RetryableProvisioningManagerImpl implements RetryableProvisioningMa
     }
 
     @Override
-    public List<ProvisioningStatus> getProvisioningStatus(String idp, String status, String entity) {
-
-        List<ProvisioningStatus> provisioningStatusList = new ArrayList<>();
+    public List<ProvisioningStatus> getProvisioningStatus(String idp, String status, String entity)
+            throws RetryableProvisioningException {
 
         //Create a filter config based on the parameters.
         FilterConfig filterConfig = new FilterConfig();
@@ -101,47 +99,33 @@ public class RetryableProvisioningManagerImpl implements RetryableProvisioningMa
         filterConfig.setIdp(idp);
         filterConfig.setStatus(status);
 
-        try {
-            provisioningStatusList = provisioningStatusDAO.getProvisioningStatus(filterConfig, tenantId);
-        } catch (RetryableProvisioningException e) {
-            log.error(String.format("Error while retrieving Provisioning status information for idp %s, status %s " +
-                    "and entity %s ", idp, status, entity), e);
-        }
-        return provisioningStatusList;
+        return provisioningStatusDAO.getProvisioningStatus(filterConfig, CarbonContext.getThreadLocalCarbonContext()
+                .getTenantId());
     }
 
     @Override
-    public boolean deleteStatusEntry(List<Integer> statusIds) {
-        boolean isDeleted = false;
-        try {
-            isDeleted = provisioningStatusDAO.deleteProvisioningStatus(statusIds);
-        } catch (RetryableProvisioningException e) {
-            log.error("Error while deleting Provisioning Status", e);
-        }
-        return isDeleted;
+    public boolean deleteStatusEntry(List<Integer> statusIds) throws RetryableProvisioningException {
+        return provisioningStatusDAO.deleteProvisioningStatus(statusIds);
     }
 
     @Override
-    public void retryProvisioning(List<Integer> statusIds) {
+    public void retryProvisioning(List<Integer> statusIds) throws RetryableProvisioningException {
         List<ProvisioningMetadata> metadataList;
         List<Integer> provisioningIDsToDelete = new ArrayList<>();
-        try {
-            metadataList = provisioningMetadataDAO.getProvisioningMetadata(statusIds);
-            for (ProvisioningMetadata provisioningMetadata : metadataList) {
-                ProvisioningEntity provisioningEntity = jsonConverter.convertFromJson(provisioningMetadata
-                        .getProvisioningEntity());
-                String idpName = gson.fromJson(provisioningMetadata.getConnectorConfiguration(), Properties.class)
-                        .getProperty(RetryableProvisioningConstants.IDP_NAME);
-                OutboundProvisioningManager.getInstance().provisionToIDP(provisioningEntity, idpName);
 
-                provisioningIDsToDelete.add(provisioningMetadata.getStatusId());
-            }
+        metadataList = provisioningMetadataDAO.getProvisioningMetadata(statusIds);
+        for (ProvisioningMetadata provisioningMetadata : metadataList) {
+            ProvisioningEntity provisioningEntity = jsonConverter.convertFromJson(provisioningMetadata
+                    .getProvisioningEntity());
+            String idpName = gson.fromJson(provisioningMetadata.getConnectorConfiguration(), Properties.class)
+                    .getProperty(RetryableProvisioningConstants.IDP_NAME);
+            OutboundProvisioningManager.getInstance().provisionToIDP(provisioningEntity, idpName);
 
-            //The retry process should be immutable. So we remove the re-attempted provisions.
-            provisioningStatusDAO.deleteProvisioningStatus(provisioningIDsToDelete);
-        } catch (RetryableProvisioningException e) {
-            log.error("Error while reattempting provisioning. ", e);
+            provisioningIDsToDelete.add(provisioningMetadata.getStatusId());
         }
+
+        //The retry process should be immutable. So we remove the re-attempted provisions.
+        provisioningStatusDAO.deleteProvisioningStatus(provisioningIDsToDelete);
     }
 
     /**
@@ -156,7 +140,7 @@ public class RetryableProvisioningManagerImpl implements RetryableProvisioningMa
         String provisioningEntityString = jsonConverter.convertToJson(provisioningEntity);
 
         ProvisioningMetadata provisioningMetadata = new ProvisioningMetadata();
-        provisioningMetadata.setTenantId(tenantId);
+        provisioningMetadata.setTenantId(CarbonContext.getThreadLocalCarbonContext().getTenantId());
         provisioningMetadata.setProvisioningEntity(provisioningEntityString);
         provisioningMetadata.setConnectorConfiguration(gson.toJson(config));
         provisioningMetadata.setIdpName(config.getProperty(RetryableProvisioningConstants.IDP_NAME));
@@ -178,13 +162,13 @@ public class RetryableProvisioningManagerImpl implements RetryableProvisioningMa
         ProvisioningStatus provisioningStatus = new ProvisioningStatus();
         provisioningStatus.setIdpName(config.getProperty(RetryableProvisioningConstants.IDP_NAME));
 
-        //Check whether the status code is 200 or 201
-        if (HttpStatus.SC_OK != statusCode && HttpStatus.SC_CREATED != statusCode) {
-            provisioningStatus.setStatus("FAILED");
+        //Check whether the status code is 200, 201 or 202
+        if (HttpStatus.SC_OK != statusCode && HttpStatus.SC_CREATED != statusCode && HttpStatus.SC_ACCEPTED != statusCode) {
+            provisioningStatus.setStatus(RetryableProvisioningConstants.FAILED);
         } else {
-            provisioningStatus.setStatus("SUCCESS");
+            provisioningStatus.setStatus(RetryableProvisioningConstants.SUCCESS);
         }
-        provisioningStatus.setTenantId(tenantId);
+        provisioningStatus.setTenantId(CarbonContext.getThreadLocalCarbonContext().getTenantId());
         provisioningStatus.setOperation(provisioningEntity.getOperation().name());
         provisioningStatus.setCause(cause);
         provisioningStatus.setName(provisioningEntity.getEntityName());

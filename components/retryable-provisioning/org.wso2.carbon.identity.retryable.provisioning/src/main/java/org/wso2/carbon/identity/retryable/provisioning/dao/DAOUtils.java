@@ -17,7 +17,16 @@
  */
 package org.wso2.carbon.identity.retryable.provisioning.dao;
 
+import org.wso2.carbon.identity.retryable.provisioning.constants.RetryableProvisioningConstants;
+
+/**
+ * Utility class for DAOs.
+ */
 public class DAOUtils {
+
+    private DAOUtils() {
+        //Private Constructor.
+    }
 
     /**
      * This method will generate dynamic sql query in the following format.
@@ -51,7 +60,6 @@ public class DAOUtils {
                 stringBuilder.append(",");
             }
         }
-        return query + "( " + stringBuilder.toString() + ")";
+        return query.replaceAll(RetryableProvisioningConstants.REPLACEABLE_CHAR, stringBuilder.toString());
     }
-
 }

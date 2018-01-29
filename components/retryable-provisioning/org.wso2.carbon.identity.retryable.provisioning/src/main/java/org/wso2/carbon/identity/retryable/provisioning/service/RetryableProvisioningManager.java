@@ -18,6 +18,7 @@
 package org.wso2.carbon.identity.retryable.provisioning.service;
 
 import org.wso2.carbon.identity.retryable.provisioning.beans.ProvisioningStatus;
+import org.wso2.carbon.identity.retryable.provisioning.exception.RetryableProvisioningException;
 
 import java.util.List;
 import java.util.Map;
@@ -42,10 +43,11 @@ public interface RetryableProvisioningManager {
      *
      * @param idp    : The name of the idp which the records should be retrieved.
      * @param status : The status of the required records
-     * @param entity : The required entity.
+     * @param entity : The required entity type (User or Group).
      * @return List of ProvisioningStatus objects which matches the provided parameters.
      */
-    List<ProvisioningStatus> getProvisioningStatus(String idp, String status, String entity);
+    List<ProvisioningStatus> getProvisioningStatus(String idp, String status, String entity)
+            throws RetryableProvisioningException;
 
     /**
      * Delete the set of Provisioning status entries which matches the given identifiers. This will be called by the
@@ -54,13 +56,13 @@ public interface RetryableProvisioningManager {
      * @param statusIds : The list of identifiers that need to be deleted.
      * @return : True if the entries deleted. False otherwise.
      */
-    boolean deleteStatusEntry(List<Integer> statusIds);
+    boolean deleteStatusEntry(List<Integer> statusIds) throws RetryableProvisioningException;
 
     /**
      * Method to re-attempt the user selected, failed provisions.
      *
      * @param statusIds : The identifier of the failed Provisioning which should be re-attempted.
      */
-    void retryProvisioning(List<Integer> statusIds);
+    void retryProvisioning(List<Integer> statusIds) throws RetryableProvisioningException;
 
 }

@@ -30,6 +30,9 @@ public class RetryableProvisioningConstants {
     public static final String IDP_NAME = "identityProviderName";
     public static final String STATUS_CODE = "status_code";
     public static final String CAUSE_TEXT = "cause";
+    public static final String REPLACEABLE_CHAR = "#";
+    public static final String SUCCESS = "SUCCESS";
+    public static final String FAILED = "FAILED";
 
     public class DAOConstants {
 
@@ -39,15 +42,15 @@ public class RetryableProvisioningConstants {
         public static final String ADD_PROVISIONING_STATUS = "INSERT INTO IDN_PROVISIONING_STATUS (TENANT_ID, " +
                 "IDP_NAME, STATUS, ENTITY, OPERATION, CAUSE) VALUES (?, ?, ?, ?, ?, ?)";
         public static final String DELETE_PROVISIONING_STATUS = "DELETE FROM IDN_PROVISIONING_STATUS WHERE STATUS_ID " +
-                "IN ";
+                "IN (#)";
 
         //Provisioning metadata queries.
         public static final String ADD_PROVISIONING_METADATA = "INSERT INTO IDN_PROVISIONING_METADATA (STATUS_ID, " +
                 "TENANT_ID, PROVISIONING_ENTITY, CONNECTOR_CONFIG) VALUES (?, ?, ?, ?)";
         public static final String GET_PROVISIONING_METADATA = "SELECT * FROM IDN_PROVISIONING_METADATA WHERE " +
-                "STATUS_ID IN ";
+                "STATUS_ID IN (#) ORDER BY STATUS_ID";
         public static final String DELETE_PROVISIONING_METADATA = "DELETE FROM IDN_PROVISIONING_METADATA WHERE " +
-                "STATUS_ID IN ";
+                "STATUS_ID IN (#)";
 
     }
 }

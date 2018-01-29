@@ -38,10 +38,6 @@ public class ProvisioningStatusHandler extends AbstractEventHandler {
     private static final String HANDLER_NAME = "provisioningStatusHandler";
     private static final Integer PRIORITY = 10;
 
-    private ProvisioningStatusHandler() {
-        throw new IllegalStateException("Utility Class");
-    }
-
     @Override
     public String getName() {
         return HANDLER_NAME;
