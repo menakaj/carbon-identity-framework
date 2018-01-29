@@ -2,15 +2,15 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
 
     <parent>
         <groupId>org.wso2.carbon.identity.framework</groupId>
-        <artifactId>retryable-provisioning</artifactId>
+        <artifactId>retryable-provisioning-feature</artifactId>
         <version>5.10.109-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
+    <modelVersion>4.0.0</modelVersion>
     <artifactId>org.wso2.carbon.identity.retryable.provisioning.server.feature</artifactId>
     <packaging>pom</packaging>
     <name>WSO2 Carbon - Retryable Identity Provisioning Server Feature</name>
@@ -18,13 +18,13 @@
     <dependencies>
         <dependency>
             <groupId>org.wso2.carbon.identity.framework</groupId>
-            <artifactId>org.wso2.carbon.identity.retryable.provisioning.endpoint</artifactId>
-            <type>war</type>
+            <artifactId>org.wso2.carbon.identity.retryable.provisioning</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon.identity.framework</groupId>
-            <artifactId>org.wso2.carbon.identity.retryable.provisioning</artifactId>
+            <artifactId>org.wso2.carbon.identity.retryable.provisioning.endpoint</artifactId>
+            <type>war</type>
             <version>${project.version}</version>
         </dependency>
     </dependencies>
@@ -107,7 +107,8 @@
                                 </bundleDef>
                             </bundles>
                             <importFeatures>
-                                <importFeatureDef>org.wso2.carbon.core:compatible:${carbon.kernel.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.core:compatible:${carbon.kernel.version}
+                                </importFeatureDef>
                             </importFeatures>
                         </configuration>
                     </execution>
