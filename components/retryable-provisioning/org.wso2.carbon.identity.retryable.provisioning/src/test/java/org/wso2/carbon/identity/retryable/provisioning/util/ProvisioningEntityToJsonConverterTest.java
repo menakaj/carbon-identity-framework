@@ -17,9 +17,7 @@
  */
 package org.wso2.carbon.identity.retryable.provisioning.util;
 
-import org.junit.After;
 import org.testng.Assert;
-import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import org.wso2.carbon.identity.provisioning.ProvisioningEntity;
@@ -39,13 +37,13 @@ public class ProvisioningEntityToJsonConverterTest {
         provisioningEntity = TestUtils.generateProvisioningEntity();
     }
 
-    @Test (description = "Test converting ProvisioningEntity object to Json string")
+    @Test(description = "Test converting ProvisioningEntity object to Json string")
     public void testConvertToJson() {
         String jsonString = provisioningEntityToJsonConverter.convertToJson(provisioningEntity);
         Assert.assertNotNull(jsonString);
     }
 
-    @Test (description = "Test conversion of the given json string to ProvisioningEntity object.")
+    @Test(description = "Test conversion of the given json string to ProvisioningEntity object.")
     public void testConvertToProvisioningEntity() {
         ProvisioningEntity provisioningEntityGen = provisioningEntityToJsonConverter.convertFromJson(TestUtils
                 .getJSONOutput());
