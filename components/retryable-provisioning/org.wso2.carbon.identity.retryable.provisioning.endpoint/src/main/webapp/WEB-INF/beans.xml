@@ -7,6 +7,9 @@
     <bean class="org.springframework.beans.factory.config.PreferencesPlaceholderConfigurer"/>
     <jaxrs:server id="services" address="/">
         <jaxrs:serviceBeans>
+            <bean class="org.wso2.carbon.identity.retryable.provisioning.endpoint.DeleteProvisioningApi"/>
+            <bean class="org.wso2.carbon.identity.retryable.provisioning.endpoint.ProvisioningStatusApi"/>
+            <bean class="org.wso2.carbon.identity.retryable.provisioning.endpoint.ReAttemptProvisioningApi"/>
         </jaxrs:serviceBeans>
         <jaxrs:providers>
             <bean class="com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider"/>

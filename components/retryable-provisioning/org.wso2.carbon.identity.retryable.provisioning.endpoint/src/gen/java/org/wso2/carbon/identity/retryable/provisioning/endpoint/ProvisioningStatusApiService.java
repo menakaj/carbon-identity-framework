@@ -15,7 +15,11 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.wso2.carbon.identity.retryable.provisioning.endpoint.impl;
+package org.wso2.carbon.identity.retryable.provisioning.endpoint;
 
-public class RetryableProvisioningEndpointImpl {
+import javax.ws.rs.core.Response;
+
+public abstract class ProvisioningStatusApiService {
+    public abstract Response provisioningStatusGet(String status, String type, String idp);
 }
+
