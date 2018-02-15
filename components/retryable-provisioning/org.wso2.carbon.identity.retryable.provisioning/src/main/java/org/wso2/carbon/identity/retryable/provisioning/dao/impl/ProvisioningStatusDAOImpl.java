@@ -51,7 +51,8 @@ public class ProvisioningStatusDAOImpl implements ProvisioningStatusDAO {
 
         try {
             connection = IdentityDatabaseUtil.getDBConnection();
-            preparedStatement = connection.prepareStatement(RetryableProvisioningConstants.DAOConstants.ADD_PROVISIONING_STATUS);
+            preparedStatement = connection.prepareStatement(
+                    RetryableProvisioningConstants.DAOConstants.ADD_PROVISIONING_STATUS);
 
             boolean isAutoCommit = connection.getAutoCommit();
 
@@ -62,10 +63,12 @@ public class ProvisioningStatusDAOImpl implements ProvisioningStatusDAO {
             connection.setAutoCommit(false);
             preparedStatement.setInt(1, provisioningStatus.getTenantId());
             preparedStatement.setString(2, provisioningStatus.getIdpName());
-            preparedStatement.setString(3, provisioningStatus.getStatus());
-            preparedStatement.setString(4, provisioningStatus.getEntity());
-            preparedStatement.setString(5, getProvisioningOperation(provisioningStatus.getOperation()));
-            preparedStatement.setString(6, provisioningStatus.getCause());
+            preparedStatement.setString(3, provisioningStatus.getConnector());
+            preparedStatement.setString(4, provisioningStatus.getStatus());
+            preparedStatement.setString(5, provisioningStatus.getEntity());
+            preparedStatement.setString(6, provisioningStatus.getName());
+            preparedStatement.setString(7, getProvisioningOperation(provisioningStatus.getOperation()));
+            preparedStatement.setString(8, provisioningStatus.getCause());
 
             preparedStatement.executeUpdate();
 
@@ -94,7 +97,6 @@ public class ProvisioningStatusDAOImpl implements ProvisioningStatusDAO {
     public List<ProvisioningStatus> getProvisioningStatus(FilterConfig filterConfig, Integer tenantId) throws
             RetryableProvisioningException {
 
-        String entity = filterConfig.getEntity();
         String status = filterConfig.getStatus();
         String idp = filterConfig.getIdp();
 
@@ -111,8 +113,7 @@ public class ProvisioningStatusDAOImpl implements ProvisioningStatusDAO {
             // Build the sql query. If the filter is not present used wild card.
             preparedStatement.setInt(1, tenantId);
             preparedStatement.setString(2, status != null ? status : "%");
-            preparedStatement.setString(3, entity != null ? entity : "%");
-            preparedStatement.setString(4, idp != null ? idp : "%");
+            preparedStatement.setString(3, idp != null ? idp : "%");
 
             resultSet = preparedStatement.executeQuery();
 
@@ -128,18 +129,18 @@ public class ProvisioningStatusDAOImpl implements ProvisioningStatusDAO {
                 provisioningStatus.setStatus(resultSet.getString("STATUS"));
                 provisioningStatus.setEntity(resultSet.getString("ENTITY"));
                 provisioningStatus.setIdpName(resultSet.getString("IDP_NAME"));
+                provisioningStatus.setName(resultSet.getString("ENTITY_NAME"));
                 provisioningStatus.setOperation(resultSet.getString("OPERATION"));
                 provisioningStatus.setCause(resultSet.getString("CAUSE"));
+                provisioningStatus.setConnector(resultSet.getString("CONNECTOR"));
 
                 provisioningStatusList.add(provisioningStatus);
             }
-
         } catch (SQLException e) {
             throw new RetryableProvisioningException("Error while retrieving Provisioning Status.", e);
         } finally {
             IdentityDatabaseUtil.closeAllConnections(connection, resultSet, preparedStatement);
         }
-
         return provisioningStatusList;
     }
 
@@ -173,11 +174,38 @@ public class ProvisioningStatusDAOImpl implements ProvisioningStatusDAO {
         return true;
     }
 
+    @Override
+    public Integer getProvisioningStatusByName(String entityName) throws RetryableProvisioningException {
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
+        ResultSet resultSet = null;
+        int statusId = -1;
+
+        try {
+            connection = IdentityDatabaseUtil.getDBConnection();
+            preparedStatement = connection.prepareStatement(RetryableProvisioningConstants.DAOConstants
+                    .GET_PROVISIONING_STATUS_FOR_STATUS_NAME);
+            preparedStatement.setString(1, entityName);
+
+            resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                statusId = resultSet.getInt(1);
+            }
+        } catch (SQLException e) {
+            throw new RetryableProvisioningException("Error while retrieving provisioning status for entity '" +
+                    entityName + "'. ", e);
+        } finally {
+            IdentityDatabaseUtil.closeAllConnections(connection, resultSet, preparedStatement);
+        }
+        return statusId;
+    }
+
     /**
      * Method to get the operation based on the http method.
      *
      * @param method : The HTTP Method
-     * @return :
+     * @return : The proper operation related to the method.
      */
     private String getProvisioningOperation(String method) {
         String op = method.toLowerCase();

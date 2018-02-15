@@ -123,7 +123,8 @@ public class ProvisioningEntityToJsonConverter {
                 .getAttributes());
 
         // 3. Convert the json string of Inbound attributes to it's original map.
-        Map<String, String> inboundAttributes = convertJsonToStringMap(serialozableProvisioningEntity.getInboundAttributes());
+        Map<String, String> inboundAttributes = convertJsonToStringMap(
+                serialozableProvisioningEntity.getInboundAttributes());
 
         // 4. Extract each of the converted parameter
         ProvisioningEntityType type = serialozableProvisioningEntity.getEntityType();

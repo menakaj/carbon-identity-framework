@@ -62,4 +62,13 @@ public interface ProvisioningStatusDAO {
      */
     boolean deleteProvisioningStatus(List<Integer> provisioningIds) throws RetryableProvisioningException;
 
+    /**
+     * Retrieve the provisioning status identifier for the given entity name.
+     *
+     * @param entityName : The name of the entity
+     * @return : If there are any provisioning status, the respective Id will be return. Otherwise -1.
+     * @throws RetryableProvisioningException :
+     */
+    Integer getProvisioningStatusByName(String entityName) throws RetryableProvisioningException;
+
 }

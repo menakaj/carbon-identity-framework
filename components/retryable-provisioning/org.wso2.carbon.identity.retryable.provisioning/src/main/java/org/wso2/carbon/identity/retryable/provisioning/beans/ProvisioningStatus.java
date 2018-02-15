@@ -27,6 +27,7 @@ public class ProvisioningStatus implements Serializable {
     private Integer identifier;
     private Integer tenantId;
     private String status;
+    private String connector;
     private String cause;
     private String entity;
     private String name;
@@ -47,6 +48,14 @@ public class ProvisioningStatus implements Serializable {
 
     public void setTenantId(Integer tenantId) {
         this.tenantId = tenantId;
+    }
+
+    public String getConnector() {
+        return connector;
+    }
+
+    public void setConnector(String connector) {
+        this.connector = connector;
     }
 
     public String getStatus() {

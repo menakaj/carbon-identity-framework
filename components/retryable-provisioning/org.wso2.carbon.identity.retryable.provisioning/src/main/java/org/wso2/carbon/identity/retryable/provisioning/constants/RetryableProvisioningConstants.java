@@ -31,18 +31,39 @@ public class RetryableProvisioningConstants {
     public static final String STATUS_CODE = "status_code";
     public static final String CAUSE_TEXT = "cause";
     public static final String REPLACEABLE_CHAR = "#";
+    public static final String COMMA = ",";
+    public static final String VALUE_PLACEHOLDER = "?";
     public static final String SUCCESS = "SUCCESS";
     public static final String FAILED = "FAILED";
+    public static final String CONNECTOR = "connector";
 
     public class DAOConstants {
 
+        private DAOConstants() {
+            throw new IllegalStateException("Could not create an instance.");
+        }
+
+        /**
+         * Note:
+         * The # symbol is used as a placeholder for a dynamic query. In the runtime, this symbol will be
+         * replaced with one or more '?' s based on the parameters.
+         *
+         * Ex: For delete status ids, [2,3,4] the query will be like,
+         *
+         * DELETE FROM DELETE FROM IDN_PROVISIONING_STATUS WHERE STATUS_ID IN (?, ?, ?);
+         *
+         * And the proper values will be assigned in prepare statement.
+         * */
+
         //Provisioning status queries.
         public static final String GET_PROVISIONING_STATUS = "SELECT * FROM IDN_PROVISIONING_STATUS WHERE " +
-                "TENANT_ID = ? AND STATUS LIKE ? AND ENTITY LIKE ? AND IDP_NAME LIKE ?";
+                "TENANT_ID = ? AND STATUS LIKE ? AND IDP_NAME LIKE ?";
         public static final String ADD_PROVISIONING_STATUS = "INSERT INTO IDN_PROVISIONING_STATUS (TENANT_ID, " +
-                "IDP_NAME, STATUS, ENTITY, OPERATION, CAUSE) VALUES (?, ?, ?, ?, ?, ?)";
+                "IDP_NAME, CONNECTOR, STATUS, ENTITY, ENTITY_NAME, OPERATION, CAUSE) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         public static final String DELETE_PROVISIONING_STATUS = "DELETE FROM IDN_PROVISIONING_STATUS WHERE STATUS_ID " +
                 "IN (#)";
+        public static final String GET_PROVISIONING_STATUS_FOR_STATUS_NAME = "SELECT STATUS_ID FROM " +
+                "IDN_PROVISIONING_STATUS WHERE ENTITY_NAME LIKE ?";
 
         //Provisioning metadata queries.
         public static final String ADD_PROVISIONING_METADATA = "INSERT INTO IDN_PROVISIONING_METADATA (STATUS_ID, " +

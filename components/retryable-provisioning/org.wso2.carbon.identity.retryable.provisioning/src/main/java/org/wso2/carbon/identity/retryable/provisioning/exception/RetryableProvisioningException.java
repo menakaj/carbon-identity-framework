@@ -17,6 +17,9 @@
  */
 package org.wso2.carbon.identity.retryable.provisioning.exception;
 
+/**
+ * Exception Class for Retryable Provisioning Component.
+ */
 public class RetryableProvisioningException extends Exception {
 
     public RetryableProvisioningException(String msg) {

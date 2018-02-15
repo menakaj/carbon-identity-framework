@@ -43,11 +43,9 @@ public interface RetryableProvisioningManager {
      *
      * @param idp    : The name of the idp which the records should be retrieved.
      * @param status : The status of the required records
-     * @param entity : The required entity type (User or Group).
      * @return List of ProvisioningStatus objects which matches the provided parameters.
      */
-    List<ProvisioningStatus> getProvisioningStatus(String idp, String status, String entity)
-            throws RetryableProvisioningException;
+    List<ProvisioningStatus> getProvisioningStatus(String idp, String status) throws RetryableProvisioningException;
 
     /**
      * Delete the set of Provisioning status entries which matches the given identifiers. This will be called by the

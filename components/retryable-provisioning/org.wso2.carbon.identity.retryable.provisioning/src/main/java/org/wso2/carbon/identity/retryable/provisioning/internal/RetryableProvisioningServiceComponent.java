@@ -41,8 +41,8 @@ public class RetryableProvisioningServiceComponent {
             BundleContext bundleContext = context.getBundleContext();
             bundleContext.registerService(AbstractEventHandler.class.getName(), new ProvisioningStatusHandler(),
                     null);
-            bundleContext.registerService(RetryableProvisioningManager.class.getName(), new RetryableProvisioningManagerImpl
-                    (), null);
+            bundleContext.registerService(RetryableProvisioningManager.class.getName(),
+                    new RetryableProvisioningManagerImpl(), null);
         } catch (Throwable t) {
             log.error("Error while activating the Retryble Provisioning bundle ", t);
         }

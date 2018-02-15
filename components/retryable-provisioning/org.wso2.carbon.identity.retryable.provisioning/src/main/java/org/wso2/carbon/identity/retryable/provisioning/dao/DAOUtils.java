@@ -50,14 +50,15 @@ public class DAOUtils {
         StringBuilder stringBuilder = new StringBuilder();
 
         if (length == 1) {
-            return query + "( ? )";
+            return query.replaceAll(RetryableProvisioningConstants.REPLACEABLE_CHAR,
+                    RetryableProvisioningConstants.VALUE_PLACEHOLDER);
         }
 
         for (int i = 0; i < length; i++) {
-            stringBuilder.append("?");
+            stringBuilder.append(RetryableProvisioningConstants.VALUE_PLACEHOLDER);
 
             if (i != length - 1) { //If the current element is not the last element, add a ','
-                stringBuilder.append(",");
+                stringBuilder.append(RetryableProvisioningConstants.COMMA);
             }
         }
         return query.replaceAll(RetryableProvisioningConstants.REPLACEABLE_CHAR, stringBuilder.toString());

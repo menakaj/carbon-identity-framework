@@ -23,7 +23,6 @@ package org.wso2.carbon.identity.retryable.provisioning.beans;
 public class FilterConfig {
 
     private String status;
-    private String entity;
     private String idp;
 
     public String getStatus() {
@@ -32,14 +31,6 @@ public class FilterConfig {
 
     public void setStatus(String status) {
         this.status = status;
-    }
-
-    public String getEntity() {
-        return entity;
-    }
-
-    public void setEntity(String entity) {
-        this.entity = entity;
     }
 
     public String getIdp() {

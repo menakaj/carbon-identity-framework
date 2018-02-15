@@ -67,7 +67,8 @@ public class ProvisioningMetadataDAOImpl implements ProvisioningMetadataDAO {
     }
 
     @Override
-    public List<ProvisioningMetadata> getProvisioningMetadata(List<Integer> provisioningIds) throws RetryableProvisioningException {
+    public List<ProvisioningMetadata> getProvisioningMetadata(List<Integer> provisioningIds)
+            throws RetryableProvisioningException {
 
         List<ProvisioningMetadata> provisioningMetadataList = new ArrayList<>();
         ResultSet resultSet = null;
