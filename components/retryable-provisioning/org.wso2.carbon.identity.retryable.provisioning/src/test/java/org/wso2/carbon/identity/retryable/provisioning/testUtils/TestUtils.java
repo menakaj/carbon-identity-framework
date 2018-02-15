@@ -17,7 +17,6 @@
  */
 package org.wso2.carbon.identity.retryable.provisioning.testUtils;
 
-import org.apache.axis2.databinding.types.xsd.ID;
 import org.wso2.carbon.context.CarbonContext;
 import org.wso2.carbon.identity.application.common.model.Claim;
 import org.wso2.carbon.identity.application.common.model.ClaimMapping;
@@ -25,14 +24,17 @@ import org.wso2.carbon.identity.provisioning.ProvisioningEntity;
 import org.wso2.carbon.identity.provisioning.ProvisioningEntityType;
 import org.wso2.carbon.identity.retryable.provisioning.beans.ProvisioningMetadata;
 import org.wso2.carbon.identity.retryable.provisioning.beans.ProvisioningStatus;
-import org.wso2.carbon.identity.retryable.provisioning.beans.SerializableProvisioningEntity;
+import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
+/**
+ * Utility class for Retryable Provisioning Test cases.
+ */
 public class TestUtils {
 
     private static final String ENTITY_NAME = "test@wso2.com";
@@ -52,6 +54,11 @@ public class TestUtils {
     private static final String ENTITY = "User";
     private static final String IDP_NAME = "test_idp";
     private static final String STATUS = "SUCCESS";
+    private static final String PAYLOAD = "payload";
+    private static final String CONFIGS = "config";
+    private static final String STATUS_CODE = "status_code";
+    private static final String CAUSE_TEXT = "cause";
+    private static final String CONNECTOR_NAME = "connector";
 
     public static ProvisioningEntity generateProvisioningEntity() {
         ProvisioningEntity provisioningEntity = new ProvisioningEntity(ProvisioningEntityType.USER, org.wso2.carbon
@@ -89,6 +96,7 @@ public class TestUtils {
         provisioningStatus.setEntity(ENTITY);
         provisioningStatus.setName(ENTITY_NAME);
         provisioningStatus.setStatus(STATUS);
+        provisioningStatus.setTenantId(MultitenantConstants.SUPER_TENANT_ID);
         return provisioningStatus;
     }
 
@@ -100,6 +108,14 @@ public class TestUtils {
         provisioningMetadata.setIdpName(IDP_NAME);
         provisioningMetadata.setConnectorConfiguration("");
         return provisioningMetadata;
+    }
+
+    private static Properties generateProvisionigProperties() {
+        Properties properties = new Properties();
+        properties.setProperty("client_id", "AQSEDJJjnnhj33dsnNdksjf");
+        properties.setProperty("client_secret", "1232341874320834");
+        properties.setProperty("identityProviderName", "salesForce.com");
+        return properties;
     }
 
     public static String getJSONOutput() {
@@ -142,4 +158,13 @@ public class TestUtils {
                         "false}\\\":\\\"[\\\\\\\"en_US\\\\\\\"]\\\"}\",\"inboundAttributes\":\"null\"}\n";
     }
 
+    public static Map<String, Object> buildEventMap() {
+        Map<String, Object> eventData = new HashMap<>();
+        eventData.put(PAYLOAD, generateProvisioningEntity());
+        eventData.put(CONFIGS, generateProvisionigProperties());
+        eventData.put(STATUS_CODE, 201);
+        eventData.put(CAUSE_TEXT, "CREATED");
+        eventData.put(CONNECTOR_NAME, "testConnector");
+        return eventData;
+    }
 }

@@ -20,10 +20,13 @@
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
 
 <suite name="identity-retryable-provisioning-test-suite">
-    <test name="identity-retryable-provisioning-test-all">
+    <test name="identity-retryable-provisioning-test-all" parallel="false">
+        <parameter name="log-level" value="info"/>
         <classes>
             <class name="org.wso2.carbon.identity.retryable.provisioning.dao.ProvisioningStatusDAOTest" />
+            <class name="org.wso2.carbon.identity.retryable.provisioning.dao.ProvisioningMetadataDAOTest" />
             <class name="org.wso2.carbon.identity.retryable.provisioning.util.ProvisioningEntityToJsonConverterTest" />
+            <class name="org.wso2.carbon.identity.retryable.provisioning.service.RetryableProvisioningServiceTest" />
         </classes>
     </test>
 </suite>

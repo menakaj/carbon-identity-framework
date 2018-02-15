@@ -52,5 +52,4 @@ public class ProvisioningEntityToJsonConverterTest {
         Assert.assertEquals(provisioningEntityGen.getOperation(), provisioningEntity.getOperation());
         Assert.assertEquals(provisioningEntityGen.getAttributes(), provisioningEntity.getAttributes());
     }
-
 }
