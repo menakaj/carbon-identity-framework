@@ -300,7 +300,11 @@
                 <artifactId>wss4j</artifactId>
                 <version>${wss4j.version}</version>
             </dependency>
-
+            <dependency>
+                <groupId>org.wso2.carbon</groupId>
+                <artifactId>org.wso2.carbon.tomcat.ext</artifactId>
+                <version>${carbon.kernel.version}</version>
+            </dependency>
             <dependency>
                 <groupId>org.wso2.balana</groupId>
                 <artifactId>org.wso2.balana</artifactId>

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+        <project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <parent>
+        <groupId>org.wso2.carbon.identity.framework</groupId>
+        <artifactId>retryable-provisioning-feature</artifactId>
+        <version>5.10.111-SNAPSHOT</version>
+    </parent>
+
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>org.wso2.carbon.identity.retryable.provisioning.feature</artifactId>
+    <version>5.10.111-SNAPSHOT</version>
+    <name>WSO2 Carbon - Identity Retryable Provisioning Feature</name>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.wso2.carbon.identity.framework</groupId>
+            <artifactId>org.wso2.carbon.identity.retryable.provisioning.server.feature</artifactId>
+            <type>zip</type>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.identity.framework</groupId>
+            <artifactId>org.wso2.carbon.identity.retryable.provisioning.ui.feature</artifactId>
+            <type>zip</type>
+            <version>${project.version}</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.wso2.maven</groupId>
+                <artifactId>carbon-p2-plugin</artifactId>
+                <version>${carbon.p2.plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>p2-feature-generation</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>p2-feature-gen</goal>
+                        </goals>
+                        <configuration>
+                            <id>org.wso2.carbon.identity.retryable.provisioning</id>
+                            <propertiesFile>../../etc/feature.properties</propertiesFile>
+                            <importFeatures>
+                                <importFeatureDef>org.wso2.carbon.core:compatible:${carbon.kernel.version}</importFeatureDef>
+                            </importFeatures>
+                            <includedFeatures>
+                                <includedFeatureDef>
+                                    org.wso2.carbon.identity.framework:org.wso2.carbon.identity.retryable.provisioning.server.feature
+                                </includedFeatureDef>
+                                <includedFeatureDef>
+                                    org.wso2.carbon.identity.framework:org.wso2.carbon.identity.retryable.provisioning.ui.feature
+                                </includedFeatureDef>
+                            </includedFeatures>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+    
+</project>

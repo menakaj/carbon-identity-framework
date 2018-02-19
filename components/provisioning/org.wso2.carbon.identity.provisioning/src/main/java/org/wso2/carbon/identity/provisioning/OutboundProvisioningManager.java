@@ -365,16 +365,16 @@ public class OutboundProvisioningManager {
         return null;
     }
 
+
     /**
      * The method to perform provisioning for the given identity provider.
      *
      * In this method, the default connector for the given idp is retrieved and perform the provisioning.
      * @param provisioningEntity : The provisioning entity object.
      * @param idpName : The name of the idp which the provisioning should be performed.
+     * @param tenantDomain : The tenant domain
      */
-    public void provisionToIDP(ProvisioningEntity provisioningEntity, String idpName) {
-
-        String tenantDomain = MultitenantConstants.SUPER_TENANT_DOMAIN_NAME;
+    public boolean provisionToIDP(ProvisioningEntity provisioningEntity, String idpName, String tenantDomain) {
 
         try {
             IdentityProvider identityProvider = IdentityProviderManager.getInstance().getEnabledIdPByName(idpName,
@@ -390,13 +390,16 @@ public class OutboundProvisioningManager {
             Callable<Boolean> proThread = new ProvisioningThread(provisioningEntity, tenantDomain, connector,
                     connectorType, idpName, dao);
             executeOutboundProvisioning(provisioningEntity, executorService, connectorType, idpName, proThread, false);
-
+            return true;
         } catch (IdentityProviderManagementException e) {
             log.error("Error while retrieving the Identity Provider. ", e);
+            return false;
         } catch (IdentityProvisioningException e) {
             log.error("Error while provisioning. ", e);
+            return false;
         }
     }
+
 
     /**
      * @param provisioningEntity
