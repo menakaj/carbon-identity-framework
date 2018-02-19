@@ -20,6 +20,7 @@ package org.wso2.carbon.identity.retryable.provisioning.endpoint.impl;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.regexp.RE;
+import org.wso2.carbon.identity.retryable.provisioning.endpoint.ApiResponseMessage;
 import org.wso2.carbon.identity.retryable.provisioning.endpoint.ReAttemptProvisioningApiService;
 import org.wso2.carbon.identity.retryable.provisioning.endpoint.dto.RetryProvisioningRequestDTO;
 import org.wso2.carbon.identity.retryable.provisioning.endpoint.util.RetryableAPIUtils;
@@ -44,17 +45,21 @@ public class ReAttemptProvisioningApiServiceImpl extends ReAttemptProvisioningAp
         RetryableProvisioningManager retryableProvisioningManager = RetryableAPIUtils.getRetryableProvisioningService();
 
         if (provisioningIds.getProvisioningIds().isEmpty()) {
-            return Response.status(Response.Status.BAD_REQUEST).entity("You should specify at least 1 status id to " +
-                    "retry.").build();
+            return Response.status(Response.Status.BAD_REQUEST).entity("You should specify at least 1 failed entity " +
+                    "to retry.").build();
         }
 
         try {
-            retryableProvisioningManager.retryProvisioning(provisioningIds.getProvisioningIds());
-            return Response.status(Response.Status.ACCEPTED).entity("The provisioning request received. The " +
-                    "Provisioning status will be updated.").build();
+            boolean result = retryableProvisioningManager.retryProvisioning(provisioningIds.getProvisioningIds());
+            return result ? Response.status(Response.Status.ACCEPTED).entity(new ApiResponseMessage
+                    (ApiResponseMessage.OK, "The provisioning request received.Please note that only the failed" +
+                            " provisions will be re-attempted.")).build() :
+                    Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(new ApiResponseMessage
+                            (ApiResponseMessage.ERROR, "Error occurred while reattempting the provisioning.")).build();
         } catch (RetryableProvisioningException e) {
             log.error("Error occurred while re-attempting the provisioning. ", e);
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(new ApiResponseMessage
+                    (ApiResponseMessage.ERROR, "Error occurred while reattempting the provisioning.")).build();
         }
     }
 }

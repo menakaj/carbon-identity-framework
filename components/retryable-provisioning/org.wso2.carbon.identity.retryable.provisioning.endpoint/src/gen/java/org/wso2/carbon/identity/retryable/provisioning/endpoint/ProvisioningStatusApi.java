@@ -52,11 +52,9 @@ public class ProvisioningStatusApi {
 
     public Response provisioningStatusGet(@ApiParam(value = "The status of the provisioning")
                                               @QueryParam("status") String status,
-                                          @ApiParam(value = "The provisioning entity type (user or group)")
-                                              @QueryParam("type") String type,
                                           @ApiParam(value = "The name of the idp.")
                                               @QueryParam("idp") String idp) {
-        return delegate.provisioningStatusGet(status, type, idp);
+        return delegate.provisioningStatusGet(status, idp);
     }
 }
 

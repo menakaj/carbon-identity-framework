@@ -60,7 +60,8 @@ public interface RetryableProvisioningManager {
      * Method to re-attempt the user selected, failed provisions.
      *
      * @param statusIds : The identifier of the failed Provisioning which should be re-attempted.
+     * @return : True if the re-attempt was completed without any issues. Else false.
      */
-    void retryProvisioning(List<Integer> statusIds) throws RetryableProvisioningException;
+    boolean retryProvisioning(List<Integer> statusIds) throws RetryableProvisioningException;
 
 }

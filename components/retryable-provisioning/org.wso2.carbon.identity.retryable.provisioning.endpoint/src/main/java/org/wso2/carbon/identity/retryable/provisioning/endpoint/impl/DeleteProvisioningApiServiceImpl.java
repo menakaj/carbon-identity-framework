@@ -19,6 +19,7 @@ package org.wso2.carbon.identity.retryable.provisioning.endpoint.impl;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.identity.retryable.provisioning.endpoint.ApiResponseMessage;
 import org.wso2.carbon.identity.retryable.provisioning.endpoint.DeleteProvisioningApiService;
 import org.wso2.carbon.identity.retryable.provisioning.endpoint.dto.RetryProvisioningRequestDTO;
 import org.wso2.carbon.identity.retryable.provisioning.endpoint.util.RetryableAPIUtils;
@@ -45,7 +46,7 @@ public class DeleteProvisioningApiServiceImpl extends DeleteProvisioningApiServi
         }
 
         if (provisioningIds.getProvisioningIds().isEmpty()) {
-            return Response.status(Response.Status.BAD_REQUEST).entity("You should specify at least 1 status id to " +
+            return Response.status(Response.Status.BAD_REQUEST).entity("You should specify at least 1 entity to " +
                     "delete.").build();
         }
 
@@ -60,13 +61,15 @@ public class DeleteProvisioningApiServiceImpl extends DeleteProvisioningApiServi
                 }
             }
 
-            return success ? Response.status(Response.Status.OK).entity("Provisioning details deleted successfully.")
-                    .build() : Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Deleting provisioning " +
-                    "details failed.").build();
-
+            return success ? Response.status(Response.Status.OK).entity(new ApiResponseMessage(ApiResponseMessage.OK,
+                    "Provisioning details deleted successfully.")).build() :
+                    Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(new ApiResponseMessage(
+                            ApiResponseMessage.ERROR, "Deleting provisioning details failed.")).build();
         } catch (RetryableProvisioningException e) {
             log.error("Error while deleting provisioning status. ", e);
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(new ApiResponseMessage(
+                    ApiResponseMessage.ERROR, "Deleting provisioning details failed.")).build();
+
         }
     }
 }

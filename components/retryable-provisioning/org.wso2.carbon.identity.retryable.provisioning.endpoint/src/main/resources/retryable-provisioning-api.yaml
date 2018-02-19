@@ -77,13 +77,6 @@ paths:
           required: false
           type: string
         -
-          name: type
-          in: query
-          description: The provisioning entity type (user or group)
-          required: false
-          type: string
-
-        -
           name: name
           in: query
           description:  The provisioned entity name.

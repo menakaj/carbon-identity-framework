@@ -23,7 +23,6 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpStatus;
 import org.wso2.carbon.context.CarbonContext;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
-import org.wso2.carbon.identity.core.util.IdentityTenantUtil;
 import org.wso2.carbon.identity.provisioning.OutboundProvisioningManager;
 import org.wso2.carbon.identity.provisioning.ProvisioningEntity;
 import org.wso2.carbon.identity.retryable.provisioning.beans.FilterConfig;
@@ -37,7 +36,6 @@ import org.wso2.carbon.identity.retryable.provisioning.dao.impl.ProvisioningStat
 import org.wso2.carbon.identity.retryable.provisioning.exception.RetryableProvisioningException;
 import org.wso2.carbon.identity.retryable.provisioning.service.RetryableProvisioningManager;
 import org.wso2.carbon.identity.retryable.provisioning.util.ProvisioningEntityToJsonConverter;
-import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -125,7 +123,7 @@ public class RetryableProvisioningManagerImpl implements RetryableProvisioningMa
     }
 
     @Override
-    public void retryProvisioning(List<Integer> statusIds) throws RetryableProvisioningException {
+    public boolean retryProvisioning(List<Integer> statusIds) throws RetryableProvisioningException {
         List<ProvisioningMetadata> metadataList;
         List<Integer> provisioningIDsToDelete = new ArrayList<>();
 
@@ -143,7 +141,7 @@ public class RetryableProvisioningManagerImpl implements RetryableProvisioningMa
         }
 
         //The retry process should be immutable. So we remove the re-attempted provisions.
-        provisioningStatusDAO.deleteProvisioningStatus(provisioningIDsToDelete);
+        return provisioningStatusDAO.deleteProvisioningStatus(provisioningIDsToDelete);
     }
 
     /**

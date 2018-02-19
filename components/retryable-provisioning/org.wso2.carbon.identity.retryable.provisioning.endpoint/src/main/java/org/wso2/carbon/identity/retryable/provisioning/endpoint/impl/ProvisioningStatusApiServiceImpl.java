@@ -42,7 +42,7 @@ public class ProvisioningStatusApiServiceImpl extends ProvisioningStatusApiServi
     private static final Log log = LogFactory.getLog(ProvisioningStatusApiService.class);
 
     @Override
-    public Response provisioningStatusGet(String status, String type, String idp) {
+    public Response provisioningStatusGet(String status, String idp) {
         RetryableProvisioningManager retryableProvisioningManager = RetryableAPIUtils.getRetryableProvisioningService();
 
         List<ProvisioningStatus> provisioningStatusList;
@@ -52,8 +52,7 @@ public class ProvisioningStatusApiServiceImpl extends ProvisioningStatusApiServi
         }
 
         try {
-            provisioningStatusList = retryableProvisioningManager.getProvisioningStatus(idp,
-                    status, type);
+            provisioningStatusList = retryableProvisioningManager.getProvisioningStatus(idp, status);
 
             if (provisioningStatusList.isEmpty()) {
 

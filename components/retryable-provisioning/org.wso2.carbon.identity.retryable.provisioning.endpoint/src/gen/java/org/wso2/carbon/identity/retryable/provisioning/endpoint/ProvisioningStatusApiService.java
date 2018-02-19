@@ -20,6 +20,6 @@ package org.wso2.carbon.identity.retryable.provisioning.endpoint;
 import javax.ws.rs.core.Response;
 
 public abstract class ProvisioningStatusApiService {
-    public abstract Response provisioningStatusGet(String status, String type, String idp);
+    public abstract Response provisioningStatusGet(String status, String idp);
 }
 
